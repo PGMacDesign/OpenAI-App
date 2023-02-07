@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:openai_appp/recyclerview_example.dart';
 import 'package:openai_appp/setup_screen.dart';
+import 'package:openai_appp/myactivities/input_activity.dart';
 
 void main() {
   runApp(const MyApp());
@@ -103,7 +104,8 @@ class _MyHomePageState extends State<MyHomePage> {
           Navigator.push(
             context,
             // MaterialPageRoute(builder: (context) => SecondPage()),
-            MaterialPageRoute(builder: (context) => MovieList()),
+            // MaterialPageRoute(builder: (context) => MovieList()),
+            MaterialPageRoute(builder: (context) => InputScreen()),
           );
         }
       ),
