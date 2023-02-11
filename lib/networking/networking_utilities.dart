@@ -10,11 +10,14 @@ Map<String, String> buildCompletionsRequestHeaders(String apiKey) {
 }
 
 /// Build Request Params for an OpenAI request
-Map<String, Object> buildCompletionsRequestParams(String prompt, {maxTokens = 100, temperature = 0.5}) {
+Map<String, Object> buildCompletionsRequestParams(String prompt, {addMarkdownRequest = true, maxTokens = 250, temperature = 0.1}) {
+  String addMDString = ". Return in Markdown format with appropriate soft-wrapping so it can be wrapped into a webview";
+  String addJSONString = ". Return the response in JSON format";
   Map<String, Object> map = {};
-  map["prompt"] = prompt;
-  map["max_tokens"] = (maxTokens == null) ? 100 : maxTokens;
-  map["temperature"] = (temperature == null) ? 0.5 : temperature;
+  map["prompt"] = prompt + ((addMarkdownRequest) ? addMDString : "");
+  map["model"] = "text-davinci-003";
+  map["max_tokens"] = (maxTokens == null) ? 256 : maxTokens;
+  map["temperature"] = (temperature == null) ? 0.1 : temperature;
   return map;
 }
 
@@ -22,11 +25,12 @@ Map<String, Object> buildCompletionsRequestParams(String prompt, {maxTokens = 10
 Future<http.Response?> sendCompletionsApiRequest(String? endpoint,
                                                  Map<String, String> headers,
                                                  Map<String, Object> params) async {
-  Uri? toSend;
+  var toSend;
   try {
     toSend = (endpoint != null)
-        ? Uri.parse(endpoint)
-        : Uri.parse("https://api.openai.com/v1/engines/davinci/completions");
+        ? Uri.https(endpoint)
+        // : Uri.https("api.openai.com", "/v1/engines/text-davinci-003/completions");
+        : Uri.https("api.openai.com", "/v1/completions");
     print("ABOUT TO SEND TO: $toSend");
     print("headers: " + headers.toString());
     print("params: " + params.toString());
@@ -37,7 +41,8 @@ Future<http.Response?> sendCompletionsApiRequest(String? endpoint,
     print("Exception: $e");
     return null;
   }
-  return await http.post(toSend, headers: headers, body: json.encode(params));
+  return await http.post(toSend, headers: headers, body: json.encode(params),
+      encoding: Encoding.getByName("utf-8"));
 }
 
 
